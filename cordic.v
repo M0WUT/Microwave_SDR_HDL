@@ -22,7 +22,7 @@
 
 
 module cordic #(
-    ANGLE_WIDTH = 32, // Doesn't nicely handle this changing yet. 
+
     DATA_WIDTH = 16,
     ITERATIONS = 16
 )(
@@ -32,9 +32,11 @@ module cordic #(
     input wire signed [DATA_WIDTH - 1:0] i_yIn,
     input wire signed [31:0] i_angle,
 
-    output wire signed [DATA_WIDTH - 1:0] o_xOut, 
-    output wire signed [DATA_WIDTH - 1:0] o_yOut
+    output reg signed [DATA_WIDTH - 1:0] o_xOut, 
+    output reg signed [DATA_WIDTH - 1:0] o_yOut
 );
+
+localparam ANGLE_WIDTH = 32; // Doesn't nicely handle this changing yet.  
 
 reg signed [DATA_WIDTH:0] r_x [ITERATIONS:0];
 reg signed [DATA_WIDTH:0] r_y [ITERATIONS:0];
@@ -153,8 +155,10 @@ generate
     end
 endgenerate
 
-assign o_xOut = r_x[ITERATIONS][DATA_WIDTH: 1];
-assign o_yOut = r_y[ITERATIONS][DATA_WIDTH: 1];
+always @(negedge i_clk) begin
+    o_xOut <= r_x[ITERATIONS][DATA_WIDTH: 1];
+    o_yOut <= r_y[ITERATIONS][DATA_WIDTH: 1];
+end
 
 
 
