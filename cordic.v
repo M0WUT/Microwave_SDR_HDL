@@ -23,24 +23,24 @@
 
 module cordic #(
 
-    DATA_WIDTH = 16,
+    INPUT_DATA_WIDTH = 16,
     ITERATIONS = 16
 )(
     input wire i_clk,
     input wire i_resetn,
-    input wire signed [DATA_WIDTH - 1:0] i_xIn,
-    input wire signed [DATA_WIDTH - 1:0] i_yIn,
+    input wire signed [INPUT_DATA_WIDTH - 1:0] i_xIn,
+    input wire signed [INPUT_DATA_WIDTH - 1:0] i_yIn,
     input wire signed [31:0] i_angle,
 
-    output reg signed [DATA_WIDTH - 1:0] o_xOut, 
-    output reg signed [DATA_WIDTH - 1:0] o_yOut
+    output reg signed [INPUT_DATA_WIDTH:0] o_xOut, 
+    output reg signed [INPUT_DATA_WIDTH:0] o_yOut
 );
 
 localparam ANGLE_WIDTH = 32; // Doesn't nicely handle this changing yet.  
 
-reg signed [DATA_WIDTH:0] r_x [ITERATIONS:0];
-reg signed [DATA_WIDTH:0] r_y [ITERATIONS:0];
-reg signed [31:0] r_angleErrors [ITERATIONS:0];
+reg signed [INPUT_DATA_WIDTH:0] r_x [ITERATIONS:0];
+reg signed [INPUT_DATA_WIDTH:0] r_y [ITERATIONS:0];
+reg signed [ANGLE_WIDTH - 1:0] r_angleErrors [ITERATIONS:0];
 
 
 // This table is larger than we require, just saves re-generating
@@ -156,8 +156,8 @@ generate
 endgenerate
 
 always @(negedge i_clk) begin
-    o_xOut <= r_x[ITERATIONS][DATA_WIDTH: 1];
-    o_yOut <= r_y[ITERATIONS][DATA_WIDTH: 1];
+    o_xOut <= r_x[ITERATIONS];
+    o_yOut <= r_y[ITERATIONS];
 end
 
 

@@ -65,6 +65,11 @@ always @(posedge i_clk or negedge i_resetn) begin
         r_writeLocation <= 0;
         r_samplesRcvd <= 0;
         r_startSending <= 0;
+        r_samplesSent = 0;
+        r_fftStartLocation <= NEW_SAMPLES_PER_FFT;
+        r_readLocation <= 0;
+        o_valid <= 0;
+        o_data <= 0;
     end else begin
         if(i_valid) begin
             // Add input data to r_data
@@ -86,20 +91,8 @@ always @(posedge i_clk or negedge i_resetn) begin
         end else begin
             r_startSending <= 0;
         end
-    end
-end
 
-// Output stuff
-always @(negedge i_clk or negedge i_resetn) begin
-    if(~i_resetn) begin
-        r_samplesSent = 0;
-        r_fftStartLocation <= NEW_SAMPLES_PER_FFT;
-        r_readLocation <= 0;
-        o_valid <= 0;
-        o_data <= 0;
-    end else begin
         if (r_sending == 1) begin
-            o_data <= r_data[r_readLocation];
             o_valid <= 1;
             if(r_samplesSent == FFT_LENGTH - 1) begin
                 r_sending <= 0;
@@ -122,6 +115,15 @@ always @(negedge i_clk or negedge i_resetn) begin
             o_data <= 0;
             o_valid <= 0;
         end   
+    end
+end
+
+// Output stuff
+always @(negedge i_clk or negedge i_resetn) begin
+    if(~i_resetn) begin
+       o_data <= 0;
+    end else begin
+        o_data <= (r_sending ? r_data[r_readLocation] : 0);
     end
 end             
 
